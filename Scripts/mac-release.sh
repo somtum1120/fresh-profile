@@ -95,6 +95,12 @@ readonly certificate_path="$run_root/DeveloperIDApplication.pem"
   exit 1
 }
 
+# Keep the release bundle deterministic even when Xcode treats a standalone
+# .icns file as an unprocessed project resource.
+/bin/mkdir -p "$archived_app_path/Contents/Resources"
+/bin/cp "$project_dir/Assets/FreshProfile.icns" \
+  "$archived_app_path/Contents/Resources/FreshProfile.icns"
+
 /usr/bin/security find-certificate \
   -c "Developer ID Application:" \
   -p > "$certificate_path"

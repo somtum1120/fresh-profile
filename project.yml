@@ -18,6 +18,8 @@ targets:
     platform: macOS
     sources:
       - Sources/FreshProfile
+    resources:
+      - Assets/FreshProfile.icns
     info:
       path: Support/Info.plist
     settings:

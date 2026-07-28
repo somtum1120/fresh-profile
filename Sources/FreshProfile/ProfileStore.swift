@@ -31,7 +31,10 @@ struct ProfileStore {
         )
     }
 
-    func createProfile(id: UUID) throws -> URL {
+    func createProfile(
+        id: UUID,
+        metadata: SessionMetadata? = nil
+    ) throws -> URL {
         let profileURL = rootURL.appendingPathComponent(
             id.uuidString,
             isDirectory: true
@@ -44,7 +47,24 @@ struct ProfileStore {
 
         let markerURL = profileURL.appendingPathComponent(".freshprofile")
         try Data().write(to: markerURL, options: .atomic)
+
+        if let metadata {
+            let metadataURL = profileURL.appendingPathComponent(".session.json")
+            let encoder = JSONEncoder()
+            encoder.dateEncodingStrategy = .iso8601
+            try encoder.encode(metadata).write(to: metadataURL, options: .atomic)
+        }
+
         return profileURL
+    }
+
+    func metadata(for profileURL: URL) -> SessionMetadata? {
+        guard isOwnedProfile(profileURL) else { return nil }
+        let metadataURL = profileURL.appendingPathComponent(".session.json")
+        guard let data = try? Data(contentsOf: metadataURL) else { return nil }
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        return try? decoder.decode(SessionMetadata.self, from: data)
     }
 
     func recordProcessID(_ processID: Int32, for profileURL: URL) throws {
