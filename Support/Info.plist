@@ -18,13 +18,21 @@
   <key>CFBundlePackageType</key>
   <string>APPL</string>
   <key>CFBundleShortVersionString</key>
-  <string>0.2.1</string>
+  <string>0.2.2</string>
   <key>CFBundleVersion</key>
-  <string>3</string>
+  <string>4</string>
   <key>LSApplicationCategoryType</key>
   <string>public.app-category.utilities</string>
   <key>LSMinimumSystemVersion</key>
   <string>13.0</string>
+  <key>SUEnableAutomaticChecks</key>
+  <true/>
+  <key>SUAutomaticallyUpdate</key>
+  <true/>
+  <key>SUFeedURL</key>
+  <string>https://raw.githubusercontent.com/somtum1120/fresh-profile/main/appcast.xml</string>
+  <key>SUPublicEDKey</key>
+  <string>5gjRm6ag88mT86XGx/2KF5+8DxpkiGencefvXeC+TII=</string>
   <key>NSHighResolutionCapable</key>
   <true/>
 </dict>

@@ -203,7 +203,8 @@ struct ContentView: View {
                             )
                         )
                         .tag(session.id)
-                        .onTapGesture(count: 2) {
+                        .onTapGesture {
+                            model.selectedSessionID = session.id
                             model.showSession(id: session.id)
                         }
                         .contextMenu {
@@ -220,7 +221,7 @@ struct ContentView: View {
                 .listStyle(.inset)
                 .clipShape(RoundedRectangle(cornerRadius: 8))
 
-                Text("Select a window and choose Show, or use its context menu.")
+                Text("Click a window to bring it to the front.")
                     .font(.caption)
                     .foregroundStyle(.tertiary)
             }

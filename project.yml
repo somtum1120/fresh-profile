@@ -12,6 +12,11 @@ settings:
     PRODUCT_BUNDLE_IDENTIFIER: app.somtum.FreshProfile
     SWIFT_VERSION: "5.0"
 
+packages:
+  Sparkle:
+    url: https://github.com/sparkle-project/Sparkle
+    exactVersion: 2.9.4
+
 targets:
   FreshProfile:
     type: application
@@ -20,6 +25,8 @@ targets:
       - Sources/FreshProfile
     resources:
       - Assets/FreshProfile.icns
+    dependencies:
+      - package: Sparkle
     settings:
       base:
         GENERATE_INFOPLIST_FILE: NO

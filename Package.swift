@@ -10,9 +10,16 @@ let package = Package(
     products: [
         .executable(name: "FreshProfile", targets: ["FreshProfile"])
     ],
+    dependencies: [
+        .package(
+            url: "https://github.com/sparkle-project/Sparkle",
+            exact: "2.9.4"
+        )
+    ],
     targets: [
         .executableTarget(
             name: "FreshProfile",
+            dependencies: [.product(name: "Sparkle", package: "Sparkle")],
             path: "Sources/FreshProfile"
         ),
         .testTarget(
