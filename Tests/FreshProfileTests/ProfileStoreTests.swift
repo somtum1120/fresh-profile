@@ -32,6 +32,21 @@ final class ProfileStoreTests: XCTestCase {
         XCTAssertFalse(FileManager.default.fileExists(atPath: profileURL.path))
     }
 
+    func testStoresSessionMetadata() throws {
+        let store = try ProfileStore(rootURL: temporaryRoot)
+        let metadata = SessionMetadata(
+            name: "Research",
+            color: .mint,
+            createdAt: Date(timeIntervalSince1970: 1_000)
+        )
+        let profileURL = try store.createProfile(
+            id: UUID(),
+            metadata: metadata
+        )
+
+        XCTAssertEqual(store.metadata(for: profileURL), metadata)
+    }
+
     func testRefusesToRemoveUnmarkedDirectory() throws {
         let store = try ProfileStore(rootURL: temporaryRoot)
         let unmarkedURL = temporaryRoot.appendingPathComponent("not-ours")
