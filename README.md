@@ -5,6 +5,14 @@ disposable browser windows. Every window receives its own user-data directory,
 so cookies, local storage, IndexedDB, service workers, and caches are not shared
 with other FreshProfile windows or with your regular browser profile.
 
+## Features
+
+- Give every private window a memorable name and one of six colors.
+- Select an active window in FreshProfile and bring it to the front.
+- Close individual private windows from the app.
+- Start every window on a color-coded page that confirms its identity.
+- Automatically remove disposable profile data when its browser exits.
+
 The initial release supports Google Chrome on macOS.
 
 > [!IMPORTANT]
@@ -14,11 +22,13 @@ The initial release supports Google Chrome on macOS.
 
 ## How it works
 
-1. FreshProfile creates a unique directory in its macOS cache directory.
+1. FreshProfile creates a unique directory with the session's name and color in
+   its macOS cache directory.
 2. It launches the browser executable with that directory passed as
    `--user-data-dir`, along with `--incognito`.
-3. When that browser process exits, FreshProfile removes the directory.
-4. If the app or Mac stops unexpectedly, FreshProfile offers to remove leftover
+3. The first tab identifies the private window by name and color.
+4. When that browser process exits, FreshProfile removes the directory.
+5. If the app or Mac stops unexpectedly, FreshProfile offers to remove leftover
    directories the next time it opens.
 
 FreshProfile never reads, copies, or modifies your regular Chrome profile.

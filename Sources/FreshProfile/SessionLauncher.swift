@@ -4,6 +4,7 @@ struct LaunchedSession {
     let id: UUID
     let process: Process
     let profileURL: URL
+    let metadata: SessionMetadata
 }
 
 struct SessionLauncher {
@@ -15,20 +16,31 @@ struct SessionLauncher {
 
     func launch(
         browser: Browser,
+        name: String,
+        color: SessionColor,
         onTermination: @escaping (UUID) -> Void
     ) throws -> LaunchedSession {
         let id = UUID()
-        let profileURL = try profileStore.createProfile(id: id)
+        let metadata = SessionMetadata(
+            name: name,
+            color: color,
+            createdAt: Date()
+        )
+        let profileURL = try profileStore.createProfile(
+            id: id,
+            metadata: metadata
+        )
+        let landingPageURL = try SessionLandingPage.write(
+            metadata: metadata,
+            to: profileURL
+        )
         let process = Process()
 
         process.executableURL = browser.executableURL
-        process.arguments = [
-            "--user-data-dir=\(profileURL.path)",
-            "--incognito",
-            "--new-window",
-            "--no-first-run",
-            "--no-default-browser-check"
-        ]
+        process.arguments = Self.arguments(
+            profileURL: profileURL,
+            landingPageURL: landingPageURL
+        )
 
         process.terminationHandler = { _ in
             Self.removeProfileWithRetries(
@@ -55,8 +67,23 @@ struct SessionLauncher {
         return LaunchedSession(
             id: id,
             process: process,
-            profileURL: profileURL
+            profileURL: profileURL,
+            metadata: metadata
         )
+    }
+
+    static func arguments(
+        profileURL: URL,
+        landingPageURL: URL
+    ) -> [String] {
+        [
+            "--user-data-dir=\(profileURL.path)",
+            "--incognito",
+            "--new-window",
+            "--no-first-run",
+            "--no-default-browser-check",
+            landingPageURL.absoluteString
+        ]
     }
 
     private static func removeProfileWithRetries(
