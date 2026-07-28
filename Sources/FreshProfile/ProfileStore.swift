@@ -72,8 +72,8 @@ struct ProfileStore {
     }
 
     func removeProfile(at profileURL: URL) throws {
-        let canonicalRoot = rootURL.standardizedFileURL
-        let canonicalProfile = profileURL.standardizedFileURL
+        let canonicalRoot = rootURL.resolvingSymlinksInPath()
+        let canonicalProfile = profileURL.resolvingSymlinksInPath()
         let expectedParent = canonicalProfile.deletingLastPathComponent()
 
         guard expectedParent == canonicalRoot,
@@ -95,6 +95,12 @@ struct ProfileStore {
             includingPropertiesForKeys: [.isDirectoryKey],
             options: [.skipsHiddenFiles]
         )
+        .map {
+            rootURL.appendingPathComponent(
+                $0.lastPathComponent,
+                isDirectory: true
+            )
+        }
         .filter {
             fileManager.fileExists(
                 atPath: $0.appendingPathComponent(".freshprofile").path
@@ -108,8 +114,8 @@ struct ProfileStore {
     }
 
     private func isOwnedProfile(_ profileURL: URL) -> Bool {
-        let canonicalRoot = rootURL.standardizedFileURL
-        let canonicalProfile = profileURL.standardizedFileURL
+        let canonicalRoot = rootURL.resolvingSymlinksInPath()
+        let canonicalProfile = profileURL.resolvingSymlinksInPath()
 
         return canonicalProfile.deletingLastPathComponent() == canonicalRoot
             && canonicalProfile != canonicalRoot
