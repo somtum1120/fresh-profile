@@ -12,14 +12,17 @@ Important directories:
 - `Tests/FreshProfileTests`: unit tests
 - `Scripts`: local packaging helpers
 - `dist`: ignored build output
+- `project.yml`: XcodeGen project used for signed distribution builds
 
 ## Commands
 
 - Setup: open `Package.swift` in Xcode 15 or newer
+- Release tool setup on macOS: `./Scripts/install-rcodesign.sh`
 - Run: `swift run`
 - Test: `swift test`
 - Lint: compiler warnings via `swift build`
 - Build: `./Scripts/build-app.sh`
+- Signed release: `./Scripts/remote-release.sh`
 
 ## Conventions
 
