@@ -1,0 +1,46 @@
+name: FreshProfile
+
+options:
+  minimumXcodeGenVersion: 2.44.1
+  deploymentTarget:
+    macOS: "13.0"
+
+settings:
+  base:
+    CODE_SIGN_STYLE: Automatic
+    ENABLE_HARDENED_RUNTIME: YES
+    PRODUCT_BUNDLE_IDENTIFIER: app.somtum.FreshProfile
+    SWIFT_VERSION: "5.0"
+
+targets:
+  FreshProfile:
+    type: application
+    platform: macOS
+    sources:
+      - Sources/FreshProfile
+    info:
+      path: Support/Info.plist
+    settings:
+      base:
+        PRODUCT_NAME: FreshProfile
+
+  FreshProfileTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - Tests/FreshProfileTests
+    dependencies:
+      - target: FreshProfile
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+
+schemes:
+  FreshProfile:
+    build:
+      targets:
+        FreshProfile: all
+        FreshProfileTests: [test]
+    test:
+      targets:
+        - FreshProfileTests

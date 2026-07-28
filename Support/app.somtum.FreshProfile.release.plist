@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>app.somtum.FreshProfile.release</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/zsh</string>
+    <string>/tmp/FreshProfile/Scripts/mac-release.sh</string>
+  </array>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>XCODEGEN_BIN</key>
+    <string>/usr/local/bin/xcodegen</string>
+  </dict>
+  <key>RunAtLoad</key>
+  <false/>
+  <key>StandardOutPath</key>
+  <string>/tmp/FreshProfile-release.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>/tmp/FreshProfile-release.err.log</string>
+  <key>WorkingDirectory</key>
+  <string>/tmp/FreshProfile</string>
+</dict>
+</plist>

@@ -21,7 +21,7 @@ struct ProfileStore {
                 create: true
             )
             self.rootURL = cacheURL
-                .appendingPathComponent("app.freshprofile.FreshProfile")
+                .appendingPathComponent("app.somtum.FreshProfile")
                 .appendingPathComponent("Sessions")
         }
 

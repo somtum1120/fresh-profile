@@ -29,6 +29,13 @@ FreshProfile never reads, copies, or modifies your regular Chrome profile.
 - Google Chrome installed in `/Applications` or `~/Applications`
 - Xcode 15 or newer for development
 
+## Download
+
+Download the signed and Apple-notarized Universal ZIP from the
+[latest GitHub Release](https://github.com/somtum1120/fresh-profile/releases/latest).
+It supports both Apple Silicon and Intel Macs. Unzip it and move
+`FreshProfile.app` to `Applications`.
+
 ## Development
 
 Open `Package.swift` in Xcode, or use the command line:
@@ -45,14 +52,16 @@ Build a local `.app` bundle:
 open dist/FreshProfile.app
 ```
 
+Signed and notarized releases are produced on a trusted Mac using the process
+documented in [docs/releasing.md](docs/releasing.md).
+
 ## Current limitations
 
 - Browser processes can outlive FreshProfile if the launcher is force-quit.
   Leftover data is retained until the user explicitly removes it on next launch.
 - The first Chrome window may briefly show browser onboarding UI depending on
   the installed Chrome version and managed-device policies.
-- Code signing, notarization, automatic updates, and packaged releases are not
-  part of the first source-only milestone.
+- Automatic updates are not yet implemented.
 
 ## Security
 
