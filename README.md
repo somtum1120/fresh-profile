@@ -12,6 +12,7 @@ with other FreshProfile windows or with your regular browser profile.
 - Close individual private windows from the app.
 - Start every window on a color-coded page that confirms its identity.
 - Automatically remove disposable profile data when its browser exits.
+- Install signed updates automatically with Sparkle.
 
 The initial release supports Google Chrome on macOS.
 
@@ -71,7 +72,6 @@ documented in [docs/releasing.md](docs/releasing.md).
   Leftover data is retained until the user explicitly removes it on next launch.
 - The first Chrome window may briefly show browser onboarding UI depending on
   the installed Chrome version and managed-device policies.
-- Automatic updates are not yet implemented.
 
 ## Security
 

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0"
+     xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+  <channel>
+    <title>FreshProfile Updates</title>
+    <link>https://github.com/somtum1120/fresh-profile</link>
+    <description>Signed updates for FreshProfile on macOS.</description>
+    <language>en</language>
+    <item>
+      <title>FreshProfile 0.2.2</title>
+      <link>https://github.com/somtum1120/fresh-profile/releases/tag/v0.2.2</link>
+      <pubDate>Tue, 28 Jul 2026 11:58:19 +0000</pubDate>
+      <sparkle:version>4</sparkle:version>
+      <sparkle:shortVersionString>0.2.2</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
+      <description><![CDATA[
+        <p>Click a named session once to bring its Chrome window forward.</p>
+        <p>Adds signed automatic updates powered by Sparkle.</p>
+      ]]></description>
+      <enclosure
+        url="https://github.com/somtum1120/fresh-profile/releases/download/v0.2.2/FreshProfile-0.2.2-macos-universal.zip"
+        sparkle:edSignature="U82sdSa1RzIyXomdfbt8/ypiat7sIUNvm3mICz/HcqHPhKHCU1zu4sjpQQ2aIULu9MB5OBo0/Y7xNlt/1QllAQ=="
+        length="1256915"
+        type="application/octet-stream" />
+    </item>
+  </channel>
+</rss>
