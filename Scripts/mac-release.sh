@@ -118,6 +118,10 @@ readonly certificate_path="$run_root/DeveloperIDApplication.pem"
   exit 1
 }
 
+[[ "$(/usr/bin/plutil -extract CFBundleIconFile raw -o - "$app_path/Contents/Info.plist")" == "FreshProfile.icns" ]]
+[[ "$(/usr/bin/plutil -extract CFBundleShortVersionString raw -o - "$app_path/Contents/Info.plist")" == "$version" ]]
+[[ -r "$app_path/Contents/Resources/FreshProfile.icns" ]]
+
 /usr/bin/codesign --verify --deep --strict --verbose=2 "$app_path"
 /usr/bin/codesign -dv --verbose=4 "$app_path" 2>&1 \
   | /usr/bin/grep '^Authority=Developer ID Application:' >/dev/null
@@ -139,6 +143,10 @@ readonly certificate_path="$run_root/DeveloperIDApplication.pem"
 /usr/bin/xcrun stapler staple "$app_path"
 /usr/bin/xcrun stapler validate "$app_path"
 /usr/sbin/spctl --assess --type execute --verbose=4 "$app_path"
+[[ "$(/usr/bin/plutil -extract CFBundleIconFile raw -o - "$app_path/Contents/Info.plist")" == "FreshProfile.icns" ]]
+[[ "$(/usr/bin/plutil -extract CFBundleShortVersionString raw -o - "$app_path/Contents/Info.plist")" == "$version" ]]
+[[ -r "$app_path/Contents/Resources/FreshProfile.icns" ]]
+
 /usr/bin/codesign --verify --deep --strict --verbose=2 "$app_path"
 
 /usr/bin/ditto -c -k --keepParent "$app_path" "$artifact_path"

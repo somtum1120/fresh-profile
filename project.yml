@@ -20,10 +20,10 @@ targets:
       - Sources/FreshProfile
     resources:
       - Assets/FreshProfile.icns
-    info:
-      path: Support/Info.plist
     settings:
       base:
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_FILE: Support/Info.plist
         PRODUCT_NAME: FreshProfile
 
   FreshProfileTests:
