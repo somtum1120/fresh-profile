@@ -1,6 +1,12 @@
 import Foundation
 import Darwin
 
+struct StoredProfile: Equatable {
+    let id: UUID
+    let profileURL: URL
+    let metadata: SessionMetadata
+}
+
 struct ProfileStore {
     let rootURL: URL
     var fileManager: FileManager = .default
@@ -76,18 +82,35 @@ struct ProfileStore {
         try Data(String(processID).utf8).write(to: processURL, options: .atomic)
     }
 
-    func isProfileInUse(_ profileURL: URL) -> Bool {
+    func processID(for profileURL: URL) -> Int32? {
         guard isOwnedProfile(profileURL) else {
-            return false
+            return nil
         }
 
         let processURL = profileURL.appendingPathComponent(".process-id")
         guard let data = try? Data(contentsOf: processURL),
               let text = String(data: data, encoding: .utf8),
               let processID = Int32(text) else {
-            return false
+            return nil
+        }
+        return processID
+    }
+
+    func clearProcessID(for profileURL: URL) throws {
+        guard isOwnedProfile(profileURL) else {
+            throw ProfileStoreError.unsafeRemovalTarget
         }
 
+        let processURL = profileURL.appendingPathComponent(".process-id")
+        if fileManager.fileExists(atPath: processURL.path) {
+            try fileManager.removeItem(at: processURL)
+        }
+    }
+
+    func isProfileInUse(_ profileURL: URL) -> Bool {
+        guard let processID = processID(for: profileURL) else {
+            return false
+        }
         return kill(processID, 0) == 0 || errno == EPERM
     }
 
@@ -129,8 +152,26 @@ struct ProfileStore {
         .sorted { $0.lastPathComponent < $1.lastPathComponent }
     }
 
+    func persistentProfiles() throws -> [StoredProfile] {
+        try leftoverProfiles()
+            .compactMap { profileURL in
+                guard let metadata = metadata(for: profileURL),
+                      metadata.isPersistent,
+                      let id = UUID(uuidString: profileURL.lastPathComponent) else {
+                    return nil
+                }
+                return StoredProfile(id: id, profileURL: profileURL, metadata: metadata)
+            }
+            .sorted { $0.metadata.createdAt < $1.metadata.createdAt }
+    }
+
     func removableLeftoverProfiles() throws -> [URL] {
-        try leftoverProfiles().filter { !isProfileInUse($0) }
+        try leftoverProfiles().filter { profileURL in
+            guard metadata(for: profileURL)?.isPersistent != true else {
+                return false
+            }
+            return !isProfileInUse(profileURL)
+        }
     }
 
     private func isOwnedProfile(_ profileURL: URL) -> Bool {

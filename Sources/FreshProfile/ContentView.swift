@@ -65,14 +65,14 @@ struct ContentView: View {
             VStack(alignment: .leading, spacing: 3) {
                 Text("FreshProfile")
                     .font(.title.bold())
-                Text("Named, color-coded private Chrome windows.")
+                Text("Named, color-coded isolated Chrome profiles.")
                     .foregroundStyle(.secondary)
             }
 
             Spacer()
 
-            if !model.sessions.isEmpty {
-                Text("\(model.sessions.count) active")
+            if model.activeSessionCount > 0 {
+                Text("\(model.activeSessionCount) active")
                     .font(.callout.weight(.medium))
                     .foregroundStyle(.secondary)
                     .padding(.horizontal, 10)
@@ -84,7 +84,7 @@ struct ContentView: View {
 
     private var launchPanel: some View {
         VStack(alignment: .leading, spacing: 18) {
-            Label("New private window", systemImage: "plus.square.on.square")
+            Label("New profile", systemImage: "plus.square.on.square")
                 .font(.headline)
 
             if model.browsers.isEmpty {
@@ -111,6 +111,21 @@ struct ContentView: View {
                     colorPicker
                 }
 
+                VStack(alignment: .leading, spacing: 5) {
+                    Toggle(
+                        "Keep after closing",
+                        isOn: $model.keepProfileAfterClosing
+                    )
+                    .toggleStyle(.switch)
+                    Text(
+                        model.keepProfileAfterClosing
+                            ? "Cookies and logins are saved for reopening."
+                            : "Profile data is removed after closing."
+                    )
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
+                }
+
                 Picker("Browser", selection: $model.selectedBrowserID) {
                     ForEach(model.browsers) { browser in
                         Text(browser.name).tag(Optional(browser.id))
@@ -121,7 +136,7 @@ struct ContentView: View {
                 Button {
                     model.openIsolatedWindow()
                 } label: {
-                    Label("Open private window", systemImage: "plus")
+                    Label("Open profile", systemImage: "plus")
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
@@ -185,7 +200,7 @@ struct ContentView: View {
     private var sessionsPanel: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack {
-                Label("Private windows", systemImage: "square.stack.3d.up")
+                Label("Profiles", systemImage: "square.stack.3d.up")
                     .font(.headline)
                 Spacer()
                 sessionActions
@@ -203,17 +218,26 @@ struct ContentView: View {
                             )
                         )
                         .tag(session.id)
-                        .onTapGesture {
+                        .onTapGesture(count: 2) {
                             model.selectedSessionID = session.id
-                            model.showSession(id: session.id)
+                            model.openOrShowSession(id: session.id)
                         }
                         .contextMenu {
-                            Button("Show Window") {
-                                model.showSession(id: session.id)
-                            }
-                            Divider()
-                            Button("Close Window", role: .destructive) {
-                                model.closeSession(id: session.id)
+                            if session.isRunning {
+                                Button("Show Window") {
+                                    model.showSession(id: session.id)
+                                }
+                                Divider()
+                                Button("Close Window", role: .destructive) {
+                                    model.closeSession(id: session.id)
+                                }
+                            } else {
+                                Button("Open Profile") {
+                                    model.openOrShowSession(id: session.id)
+                                }
+                                Button("Delete Profile", role: .destructive) {
+                                    model.deleteProfile(id: session.id)
+                                }
                             }
                         }
                     }
@@ -221,7 +245,7 @@ struct ContentView: View {
                 .listStyle(.inset)
                 .clipShape(RoundedRectangle(cornerRadius: 8))
 
-                Text("Click a window to bring it to the front.")
+                Text("Double-click to show a window or reopen a saved profile.")
                     .font(.caption)
                     .foregroundStyle(.tertiary)
             }
@@ -231,16 +255,13 @@ struct ContentView: View {
     private var sessionActions: some View {
         HStack(spacing: 8) {
             Button {
-                model.showSelectedSession()
+                model.openOrShowSelectedSession()
             } label: {
-                Label("Show", systemImage: "macwindow")
-            }
-            .disabled(model.selectedSession == nil)
-
-            Button(role: .destructive) {
-                model.closeSelectedSession()
-            } label: {
-                Label("Close", systemImage: "xmark")
+                if model.selectedSession?.isRunning == true {
+                    Label("Show", systemImage: "macwindow")
+                } else {
+                    Label("Open", systemImage: "play.fill")
+                }
             }
             .disabled(
                 model.selectedSession == nil
@@ -248,6 +269,20 @@ struct ContentView: View {
                         model.closingSessionIDs.contains($0)
                     } == true
             )
+
+            if model.selectedSession?.isRunning == true {
+                Button(role: .destructive) {
+                    model.closeSelectedSession()
+                } label: {
+                    Label("Close", systemImage: "xmark")
+                }
+            } else if model.selectedSession?.isPersistent == true {
+                Button(role: .destructive) {
+                    model.deleteSelectedProfile()
+                } label: {
+                    Label("Delete", systemImage: "trash")
+                }
+            }
         }
         .controlSize(.small)
     }
@@ -257,7 +292,7 @@ struct ContentView: View {
             Image(systemName: "square.stack.3d.up.slash")
                 .font(.system(size: 36))
                 .foregroundStyle(.secondary)
-            Text("No private windows are open")
+            Text("No profiles yet")
                 .font(.title3.weight(.semibold))
             Text("Give one a name and color, then open it.")
                 .foregroundStyle(.secondary)
@@ -290,8 +325,8 @@ struct ContentView: View {
         HStack(spacing: 8) {
             Image(systemName: "hand.raised.fill")
             Text(
-                "Every window has separate disposable site data. "
-                    + "FreshProfile does not make browsing anonymous."
+                "Every profile has separate site data. Saved profiles keep it "
+                    + "until you delete them. FreshProfile does not make browsing anonymous."
             )
         }
         .font(.footnote)
@@ -321,7 +356,7 @@ private struct SessionRow: View {
                 HStack(spacing: 5) {
                     Text(session.browserName)
                     Text("·")
-                    Text(session.startedAt, style: .time)
+                    Text(session.isPersistent ? "Saved" : "Disposable")
                 }
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -334,9 +369,13 @@ private struct SessionRow: View {
                     .controlSize(.small)
                     .help("Closing")
             } else {
-                Text(session.color.displayName)
+                Text(session.isRunning ? "Running" : "Saved")
                     .font(.caption2.weight(.medium))
-                    .foregroundStyle(session.color.swiftUIColor)
+                    .foregroundStyle(
+                        session.isRunning
+                            ? session.color.swiftUIColor
+                            : .secondary
+                    )
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
                     .background(
@@ -348,7 +387,9 @@ private struct SessionRow: View {
         .padding(.vertical, 5)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(
-            "\(session.name), \(session.color.displayName), \(session.browserName)"
+            "\(session.name), \(session.color.displayName), "
+                + "\(session.isRunning ? "running" : "saved"), "
+                + session.browserName
         )
     }
 }
