@@ -54,16 +54,16 @@ struct FreshProfileApp: App {
             }
 
             CommandGroup(replacing: .newItem) {
-                Button("New Private Window") {
+                Button("New Profile") {
                     model.openIsolatedWindow()
                 }
                 .keyboardShortcut("n")
                 .disabled(model.selectedBrowser == nil)
             }
 
-            CommandMenu("Session") {
-                Button("Show Selected Window") {
-                    model.showSelectedSession()
+            CommandMenu("Profile") {
+                Button("Open or Show Selected Profile") {
+                    model.openOrShowSelectedSession()
                 }
                 .keyboardShortcut(.return, modifiers: [.command])
                 .disabled(model.selectedSession == nil)
@@ -71,7 +71,7 @@ struct FreshProfileApp: App {
                 Button("Close Selected Window") {
                     model.closeSelectedSession()
                 }
-                .disabled(model.selectedSession == nil)
+                .disabled(model.selectedSession?.isRunning != true)
 
                 Divider()
 

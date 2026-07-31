@@ -82,4 +82,74 @@ final class ProfileStoreTests: XCTestCase {
         XCTAssertTrue(store.isProfileInUse(profileURL))
         XCTAssertEqual(try store.removableLeftoverProfiles(), [])
     }
+
+    func testListsPersistentProfilesSeparatelyFromDisposableLeftovers() throws {
+        let store = try ProfileStore(rootURL: temporaryRoot)
+        let persistentID = UUID()
+        let persistentMetadata = SessionMetadata(
+            name: "Saved",
+            color: .mint,
+            createdAt: Date(timeIntervalSince1970: 1_000),
+            isPersistent: true
+        )
+        let persistentURL = try store.createProfile(
+            id: persistentID,
+            metadata: persistentMetadata
+        )
+        let disposableURL = try store.createProfile(
+            id: UUID(),
+            metadata: SessionMetadata(
+                name: "Temporary",
+                color: .sky,
+                createdAt: Date(timeIntervalSince1970: 2_000)
+            )
+        )
+
+        XCTAssertEqual(
+            try store.persistentProfiles(),
+            [
+                StoredProfile(
+                    id: persistentID,
+                    profileURL: persistentURL,
+                    metadata: persistentMetadata
+                )
+            ]
+        )
+        XCTAssertEqual(
+            try store.removableLeftoverProfiles(),
+            [disposableURL]
+        )
+    }
+
+    func testClearsRecordedProcessID() throws {
+        let store = try ProfileStore(rootURL: temporaryRoot)
+        let profileURL = try store.createProfile(id: UUID())
+        try store.recordProcessID(
+            ProcessInfo.processInfo.processIdentifier,
+            for: profileURL
+        )
+
+        XCTAssertNotNil(store.processID(for: profileURL))
+        try store.clearProcessID(for: profileURL)
+        XCTAssertNil(store.processID(for: profileURL))
+        XCTAssertFalse(store.isProfileInUse(profileURL))
+    }
+
+    func testLegacyMetadataDefaultsToDisposable() throws {
+        let json = """
+        {
+          "name": "Legacy",
+          "color": "sky",
+          "createdAt": "1970-01-01T00:00:00Z"
+        }
+        """
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        let metadata = try decoder.decode(
+            SessionMetadata.self,
+            from: Data(json.utf8)
+        )
+
+        XCTAssertFalse(metadata.isPersistent)
+    }
 }

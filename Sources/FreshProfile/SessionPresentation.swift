@@ -32,6 +32,17 @@ enum SessionColor: String, CaseIterable, Codable, Identifiable, Sendable {
         }
     }
 
+    var chromeThemeRGB: String {
+        switch self {
+        case .sky: "56,167,240"
+        case .mint: "50,199,149"
+        case .violet: "139,109,233"
+        case .rose: "230,107,145"
+        case .orange: "233,144,61"
+        case .slate: "101,117,139"
+        }
+    }
+
     var rgb: (red: Double, green: Double, blue: Double) {
         switch self {
         case .sky: (0.22, 0.65, 0.94)
@@ -48,6 +59,30 @@ struct SessionMetadata: Codable, Equatable, Sendable {
     let name: String
     let color: SessionColor
     let createdAt: Date
+    let isPersistent: Bool
+
+    init(
+        name: String,
+        color: SessionColor,
+        createdAt: Date,
+        isPersistent: Bool = false
+    ) {
+        self.name = name
+        self.color = color
+        self.createdAt = createdAt
+        self.isPersistent = isPersistent
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        name = try container.decode(String.self, forKey: .name)
+        color = try container.decode(SessionColor.self, forKey: .color)
+        createdAt = try container.decode(Date.self, forKey: .createdAt)
+        isPersistent = try container.decodeIfPresent(
+            Bool.self,
+            forKey: .isPersistent
+        ) ?? false
+    }
 }
 
 enum SessionName {
@@ -58,7 +93,7 @@ enum SessionName {
             .split(whereSeparator: { $0.isWhitespace })
             .joined(separator: " ")
         let limited = String(collapsed.prefix(maximumLength))
-        return limited.isEmpty ? "Private \(fallbackNumber)" : limited
+        return limited.isEmpty ? "Profile \(fallbackNumber)" : limited
     }
 }
 
@@ -81,6 +116,12 @@ enum SessionLandingPage {
     static func html(metadata: SessionMetadata) -> String {
         let name = escapeHTML(metadata.name)
         let color = metadata.color.hex
+        let profileKind = metadata.isPersistent
+            ? "Saved profile"
+            : "Disposable profile"
+        let retention = metadata.isPersistent
+            ? "Its cookies and logins remain available when you reopen it."
+            : "Its cookies and site data are removed after it closes."
 
         return """
         <!doctype html>
@@ -103,8 +144,8 @@ enum SessionLandingPage {
           <main>
             <div class="dot" aria-hidden="true"></div>
             <h1>\(name)</h1>
-            <p>This window has its own disposable browser profile. Its cookies and site data are separate from your other FreshProfile windows.</p>
-            <div class="label">Private window · \(metadata.color.displayName)</div>
+            <p>This window has its own isolated browser profile. \(retention)</p>
+            <div class="label">\(profileKind) · \(metadata.color.displayName)</div>
           </main>
         </body>
         </html>
