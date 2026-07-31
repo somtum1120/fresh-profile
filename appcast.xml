@@ -7,6 +7,25 @@
     <description>Signed updates for FreshProfile on macOS.</description>
     <language>en</language>
     <item>
+      <title>FreshProfile 0.2.3</title>
+      <link>https://github.com/somtum1120/fresh-profile/releases/tag/v0.2.3</link>
+      <pubDate>Fri, 31 Jul 2026 14:04:19 +0000</pubDate>
+      <sparkle:version>6</sparkle:version>
+      <sparkle:shortVersionString>0.2.3</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
+      <description><![CDATA[
+        <p>Adds saved isolated profiles that retain cookies and logins.</p>
+        <p>Uses profile colors for Chrome windows and Dock icons.</p>
+        <p>Reopens a profile window from Show Windows after Command-W.</p>
+        <p>Adds a polished FreshProfile application icon.</p>
+      ]]></description>
+      <enclosure
+        url="https://github.com/somtum1120/fresh-profile/releases/download/v0.2.3/FreshProfile-0.2.3-macos-universal.zip"
+        sparkle:edSignature="JBZ3BzpuNxpzWDmqpz43mTuzuathZ9d63K902Xy49o8Ii5hYfvy8dQir6tOjeULS/Y/b7bYi+nhMdM7uoXbUDA=="
+        length="3102185"
+        type="application/octet-stream" />
+    </item>
+    <item>
       <title>FreshProfile 0.2.2</title>
       <link>https://github.com/somtum1120/fresh-profile/releases/tag/v0.2.2</link>
       <pubDate>Tue, 28 Jul 2026 11:58:19 +0000</pubDate>
