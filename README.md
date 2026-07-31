@@ -1,16 +1,17 @@
 # FreshProfile
 
-FreshProfile is a small, open-source macOS app that launches isolated,
-disposable browser windows. Every window receives its own user-data directory,
-so cookies, local storage, IndexedDB, service workers, and caches are not shared
-with other FreshProfile windows or with your regular browser profile.
+FreshProfile is a small, open-source macOS app that launches isolated browser
+profiles. Every profile receives its own user-data directory, so cookies, local
+storage, IndexedDB, service workers, and caches are not shared with other
+FreshProfile profiles or with your regular browser profile.
 
 ## Features
 
-- Give every private window a memorable name and one of six colors.
+- Give every profile a memorable name and one of six colors.
 - Select an active window in FreshProfile and bring it to the front.
-- Close individual private windows from the app.
+- Close individual profile windows from the app.
 - Start every window on a color-coded page that confirms its identity.
+- Keep cookies and logins for profiles you want to reopen.
 - Automatically remove disposable profile data when its browser exits.
 - Install signed updates automatically with Sparkle.
 
@@ -26,11 +27,12 @@ The initial release supports Google Chrome on macOS.
 1. FreshProfile creates a unique directory with the session's name and color in
    its macOS cache directory.
 2. It launches the browser executable with that directory passed as
-   `--user-data-dir`, along with `--incognito`.
-3. The first tab identifies the private window by name and color.
-4. When that browser process exits, FreshProfile removes the directory.
-5. If the app or Mac stops unexpectedly, FreshProfile offers to remove leftover
-   directories the next time it opens.
+   `--user-data-dir` and opens a regular Chrome window with that profile.
+3. The first tab identifies the profile by name, color, and retention mode.
+4. Saved profiles remain in the list and can be reopened with the same cookies
+   and logins.
+5. Disposable profiles are removed when their browser process exits.
+6. Interrupted disposable data can be removed the next time the app opens.
 
 FreshProfile never reads, copies, or modifies your regular Chrome profile.
 
