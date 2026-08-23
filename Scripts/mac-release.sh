@@ -63,6 +63,18 @@ require_pushed_integration_sha() {
   print "source_sha=$source_sha"
 }
 
+safe_owned_private_file() {
+  local path="$1"
+  local mode owner_uid acl_mode
+  [[ -f "$path" && ! -L "$path" && -r "$path" ]] || return 1
+  owner_uid="$(/usr/bin/stat -f '%u' "$path")" || return 1
+  [[ "$owner_uid" == "$(/usr/bin/id -u)" ]] || return 1
+  acl_mode="$(/bin/ls -lde "$path" | /usr/bin/awk 'NR == 1 { print $1 }')" || return 1
+  [[ "$acl_mode" != *+ ]] || return 1
+  mode="$(/usr/bin/stat -f '%Lp' "$path")" || return 1
+  [[ "$mode" == "400" || "$mode" == "600" ]]
+}
+
 require_pushed_integration_sha
 
 [[ -x "$xcodegen_bin" ]] || {
@@ -75,13 +87,8 @@ require_pushed_integration_sha
   exit 1
 }
 
-[[ -r "$config_path" ]] || {
-  print -u2 "Missing App Store Connect configuration."
-  exit 1
-}
-
-[[ "$(/usr/bin/stat -f '%Lp' "$config_path")" == "600" ]] || {
-  print -u2 "App Store Connect configuration must have mode 600."
+safe_owned_private_file "$config_path" || {
+  print -u2 "App Store Connect configuration is missing or has unsafe ownership or permissions."
   exit 1
 }
 
@@ -90,8 +97,8 @@ readonly issuer_id="$(/usr/bin/plutil -extract issuerID raw -o - "$config_path")
 readonly key_path="$(/usr/bin/plutil -extract keyPath raw -o - "$config_path")"
 readonly team_id="$(/usr/bin/plutil -extract teamID raw -o - "$config_path")"
 
-[[ -r "$key_path" ]] || {
-  print -u2 "The App Store Connect private key is missing."
+safe_owned_private_file "$key_path" || {
+  print -u2 "The App Store Connect private key is missing or has unsafe ownership or permissions."
   exit 1
 }
 
