@@ -77,8 +77,8 @@ open dist/FreshProfile.app
 
 Signed and notarized releases are produced directly on the trusted Mac from
 this checkout using the process documented in [docs/releasing.md](docs/releasing.md).
-The former VM101-to-Mac remote wrapper remains only as a transitional legacy
-fallback.
+Recovery starts from the pushed GitHub revision in a fresh Mac homespace clone;
+there is no VM101-to-Mac source sync or release trigger.
 
 ## Current limitations
 

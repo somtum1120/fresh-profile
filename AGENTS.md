@@ -58,9 +58,8 @@ Important directories:
 - Build: `./Scripts/build-app.sh`
 - Signed release (trusted Mac, from the homespace checkout): `./Scripts/mac-release.sh`
 
-`./Scripts/remote-release.sh` is retained only as a transitional legacy path
-for migration recovery. It uses VM101-to-Mac rsync/dispatcher control and must
-not be extended or treated as the normal release entry point.
+There is no VM101-to-Mac sync, dispatcher, or LaunchAgent release path. Recovery
+starts by cloning the pushed GitHub revision into the Mac homespace.
 
 ## Conventions
 

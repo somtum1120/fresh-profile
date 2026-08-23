@@ -54,10 +54,9 @@ signed, notarized ZIP and checksum paths are printed by the script. Publishing
 the GitHub Release is a separate explicit step, and the source SHA should be
 recorded in the release notes.
 
-## Transitional legacy path
+## Recovery
 
-`./Scripts/remote-release.sh` is retained temporarily for migration recovery.
-It synchronizes a VM101 checkout to a Mac through rsync and a dispatcher, so it
-is not the normal path and must not be extended. Do not use it as evidence that
-the VM101 checkout is authoritative. Its ignored `Scripts/remote-release.env`
-file is legacy configuration only.
+Re-clone the pushed GitHub revision into the Mac homespace, restore only the
+documented machine-local signing configuration, and run `mac-release.sh` from a
+clean `main` whose full HEAD matches live `origin/main`. Do not recreate source
+sync, a remote dispatcher, or a LaunchAgent trigger.
