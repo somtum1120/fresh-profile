@@ -12,6 +12,7 @@ readonly result_file="${FRESH_PROFILE_RESULT_FILE:-/tmp/app.somtum.FreshProfile.
 version=""
 artifact_path=""
 checksum_path=""
+source_sha=""
 
 finish() {
   local exit_code=$?
@@ -21,10 +22,48 @@ finish() {
     print "version=$version"
     print "artifact_path=$artifact_path"
     print "checksum_path=$checksum_path"
+    print "source_sha=$source_sha"
   } > "$result_file"
   exit "$exit_code"
 }
 trap finish EXIT
+
+require_pushed_integration_sha() {
+  local branch remote_sha status_output
+  [[ -d "$project_dir/.git" ]] || {
+    print -u2 "Release source must be an ordinary Git clone"
+    return 1
+  }
+  status_output="$(/usr/bin/git -C "$project_dir" status --porcelain=v1 --untracked-files=all)"
+  [[ -z "$status_output" ]] || {
+    print -u2 "Release source checkout is dirty"
+    return 1
+  }
+  branch="$(/usr/bin/git -C "$project_dir" symbolic-ref --quiet --short HEAD)" || {
+    print -u2 "Release source must be on main, not detached HEAD"
+    return 1
+  }
+  [[ "$branch" == "main" ]] || {
+    print -u2 "Release source branch must be main"
+    return 1
+  }
+  source_sha="$(/usr/bin/git -C "$project_dir" rev-parse --verify HEAD)"
+  /usr/bin/printf '%s\n' "$source_sha" | /usr/bin/grep -Eq '^[0-9a-f]{40}$' || {
+    print -u2 "Release source SHA is invalid"
+    return 1
+  }
+  remote_sha="$(/usr/bin/git -C "$project_dir" ls-remote --exit-code --refs origin refs/heads/main | /usr/bin/awk 'NR == 1 { print $1 }')" || {
+    print -u2 "Unable to verify the pushed integration SHA"
+    return 1
+  }
+  [[ "$remote_sha" == "$source_sha" ]] || {
+    print -u2 "Release source SHA does not match GitHub origin/main"
+    return 1
+  }
+  print "source_sha=$source_sha"
+}
+
+require_pushed_integration_sha
 
 [[ -x "$xcodegen_bin" ]] || {
   print -u2 "XcodeGen was not found. Set XCODEGEN_BIN."
@@ -63,7 +102,7 @@ readonly archive_path="$run_root/FreshProfile.xcarchive"
 readonly export_path="$run_root/export"
 readonly submission_path="$run_root/FreshProfile-notarization.zip"
 readonly notary_result="$run_root/notary-result.json"
-artifact_path="$run_root/FreshProfile-$version-macos-universal.zip"
+artifact_path="$run_root/FreshProfile-$version-${source_sha[1,12]}-macos-universal.zip"
 checksum_path="$artifact_path.sha256"
 
 cd "$project_dir"
