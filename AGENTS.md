@@ -6,6 +6,19 @@ FreshProfile is a native SwiftUI macOS launcher for disposable, isolated browser
 profiles. Keep the app local-first: no analytics, accounts, network services, or
 access to the user's regular browser profile.
 
+## Working model
+
+- The personal GitHub repository `somtum1120/fresh-profile` is the integrated
+  source of truth.
+- The normal development checkout is this repository under the Mac homespace
+  (`~/homespace/projects/fresh-profile`). Use ordinary Git
+  branches, commits, and pushes.
+- VM101 checkouts, if present, are test, deploy, runtime, backup, and recovery
+  copies. Do not make routine source edits there.
+- Never reset, clean, overwrite, or relocate a dirty checkout automatically.
+- Build and signed release inputs must be pushed commit SHAs. Keep release
+  credentials and private keys on the Mac only.
+
 ## Product decisions
 
 - FreshProfile exists because multiple ordinary Chrome Incognito windows share
@@ -43,7 +56,11 @@ Important directories:
 - Test: `swift test`
 - Lint: compiler warnings via `swift build`
 - Build: `./Scripts/build-app.sh`
-- Signed release: `./Scripts/remote-release.sh`
+- Signed release (trusted Mac, from the homespace checkout): `./Scripts/mac-release.sh`
+
+`./Scripts/remote-release.sh` is retained only as a transitional legacy path
+for migration recovery. It uses VM101-to-Mac rsync/dispatcher control and must
+not be extended or treated as the normal release entry point.
 
 ## Conventions
 

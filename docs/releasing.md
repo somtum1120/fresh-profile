@@ -1,7 +1,9 @@
-# Releasing FreshProfile
+# Releasing FreshProfile from the Mac homespace
 
-FreshProfile releases are built on a trusted Mac and distributed outside the
-Mac App Store with Developer ID signing and Apple notarization.
+The personal GitHub repository `somtum1120/fresh-profile` is the integrated
+source of truth. Releases are built directly from the trusted Mac homespace
+checkout and distributed outside the Mac App Store with Developer ID signing
+and Apple notarization. VM101 is not a routine source or release endpoint.
 
 The release process:
 
@@ -21,10 +23,6 @@ downloads the official Universal archive and verifies its SHA-256 checksum:
 ```sh
 ./Scripts/install-rcodesign.sh
 ```
-
-Copy `Scripts/remote-release.env.example` to
-`.local/remote-release.env`. This ignored file identifies the trusted Mac,
-SSH key, destination directory, and XcodeGen executable.
 
 On the Mac, provide a mode-0600 property list through
 `FRESH_PROFILE_ASC_CONFIG`, or use the existing default at:
@@ -48,8 +46,18 @@ The certificate, private key, and API key must never be committed.
 ## Build
 
 ```sh
-./Scripts/remote-release.sh
+./Scripts/mac-release.sh
 ```
 
-The signed, notarized ZIP and checksum are copied to the ignored `dist`
-directory. Publishing the GitHub Release is a separate explicit step.
+Run the command from the Mac homespace checkout at a pushed commit SHA. The
+signed, notarized ZIP and checksum paths are printed by the script. Publishing
+the GitHub Release is a separate explicit step, and the source SHA should be
+recorded in the release notes.
+
+## Transitional legacy path
+
+`./Scripts/remote-release.sh` is retained temporarily for migration recovery.
+It synchronizes a VM101 checkout to a Mac through rsync and a dispatcher, so it
+is not the normal path and must not be extended. Do not use it as evidence that
+the VM101 checkout is authoritative. Its ignored `Scripts/remote-release.env`
+file is legacy configuration only.

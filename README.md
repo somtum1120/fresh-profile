@@ -51,6 +51,16 @@ It supports both Apple Silicon and Intel Macs. Unzip it and move
 
 ## Development
 
+The personal GitHub repository `somtum1120/fresh-profile` is the integrated
+source of truth. Open the Mac homespace checkout at
+`~/homespace/projects/fresh-profile` for normal Codex
+development, then use ordinary Git branches, commits, and pushes. VM101
+checkouts are for test, deploy, runtime, backup, and recovery; do not routinely
+edit them.
+
+Do not reset, clean, overwrite, or relocate a dirty checkout automatically.
+Build and signed release inputs must be pushed commit SHAs.
+
 Open `Package.swift` in Xcode, or use the command line:
 
 ```sh
@@ -65,8 +75,10 @@ Build a local `.app` bundle:
 open dist/FreshProfile.app
 ```
 
-Signed and notarized releases are produced on a trusted Mac using the process
-documented in [docs/releasing.md](docs/releasing.md).
+Signed and notarized releases are produced directly on the trusted Mac from
+this checkout using the process documented in [docs/releasing.md](docs/releasing.md).
+The former VM101-to-Mac remote wrapper remains only as a transitional legacy
+fallback.
 
 ## Current limitations
 
